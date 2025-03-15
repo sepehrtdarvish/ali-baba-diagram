@@ -36,6 +36,41 @@ CREATE TABLE Document (
     user UUID NOT NULL REFERENCES User(id) ON DELETE CASCADE
 );
 
+CREATE TABLE Ticket (
+    id UUID PRIMARY KEY,
+    origin UUID NOT NULL REFERENCES Location(id) ON DELETE CASCADE,
+    destination UUID NOT NULL REFERENCES Location(id) ON DELETE CASCADE,
+    price FLOAT CHECK (price > 0),
+    start_at TIMESTAMP NOT NULL,
+    duration INTERVAL NOT NULL,
+    delay INTERVAL DEFAULT NULL,
+    class VARCHAR(20) CHECK (class IN ('economic', 'VIP', 'business')),
+    capacity INT NOT NULL CHECK (capacity > 0),
+    vehicle_type UUID NOT NULL REFERENCES Vehicle(id) ON DELETE CASCADE,
+    stops INTERVAL DEFAULT NULL
+);
+CREATE TABLE Reservation (
+    id UUID PRIMARY KEY,
+    user UUID NOT NULL REFERENCES User(id) ON DELETE CASCADE,
+    ticket UUID NOT NULL REFERENCES Ticket(id) ON DELETE CASCADE,
+    transaction UUID DEFAULT NULL REFERENCES Transaction(id) ON DELETE SET NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    is_cancelled BOOLEAN DEFAULT FALSE,
+    has_paid BOOLEAN DEFAULT FALSE,
+    expiration_date TIMESTAMP DEFAULT NULL
+);
+
+CREATE TABLE Transaction (
+    id UUID PRIMARY KEY,
+    card_number VARCHAR(16) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    paid_amount INT NOT NULL CHECK (paid_amount >= 0),
+    tracking_code VARCHAR(50) UNIQUE NOT NULL,
+    success BOOLEAN DEFAULT FALSE,
+    payment_method VARCHAR(50) NOT NULL
+);
+
 CREATE TABLE Vehicle (
     id UUID PRIMARY KEY,
     name VARCHAR(50) NOT NULL,
