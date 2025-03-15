@@ -17,3 +17,22 @@ CREATE TABLE Profile (
     phone_number VARCHAR(20)
 );
 
+CREATE TABLE Report (
+    id UUID PRIMARY KEY,
+    subject VARCHAR(50) CHECK (subject IN ('Payments', 'Tickets', 'Delays', 'Other')),
+    description TEXT NOT NULL,
+    document UUID DEFAULT NULL REFERENCES Document(id) ON DELETE SET NULL,
+    user_id UUID NOT NULL REFERENCES User(id) ON DELETE CASCADE,
+    inspector UUID NOT NULL REFERENCES User(id) ON DELETE CASCADE,
+    is_processed BOOLEAN DEFAULT FALSE,
+    processed_at BOOLEAN DEFAULT FALSE,
+    responded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE Document (
+    id UUID PRIMARY KEY,
+    file VARCHAR(50) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    user UUID NOT NULL REFERENCES User(id) ON DELETE CASCADE
+);
+
