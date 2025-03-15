@@ -1,0 +1,19 @@
+CREATE TABLE User (
+    id UUID PRIMARY KEY,
+    username VARCHAR(100) UNIQUE NOT NULL,
+    password VARCHAR(100) NOT NULL,
+    email VARCHAR(255) UNIQUE NOT NULL,
+    is_admin BOOLEAN DEFAULT FALSE,
+    signup_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    is_active BOOLEAN DEFAULT TRUE
+);
+
+
+CREATE TABLE Profile (
+    id UUID PRIMARY KEY,
+    user UUID UNIQUE NOT NULL REFERENCES User(id) ON DELETE CASCADE,
+    full_name VARCHAR(50),
+    home_town VARCHAR(30),
+    phone_number VARCHAR(20)
+);
+
