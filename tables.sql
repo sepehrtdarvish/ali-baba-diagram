@@ -1,5 +1,10 @@
+
+-- USE alibaba_db;
+-- SHOW Tables;
+-- describe Report;
+-- USE alibaba_db;
 CREATE TABLE User (
-    id UUID PRIMARY KEY,
+    id INTEGER PRIMARY KEY,
     username VARCHAR(100) UNIQUE NOT NULL,
     password VARCHAR(100) NOT NULL,
     email VARCHAR(255) UNIQUE NOT NULL,
@@ -10,50 +15,50 @@ CREATE TABLE User (
 
 
 CREATE TABLE Profile (
-    id UUID PRIMARY KEY,
-    user UUID UNIQUE NOT NULL REFERENCES User(id) ON DELETE CASCADE,
+    id INTEGER PRIMARY KEY,
+    user INTEGER UNIQUE NOT NULL REFERENCES User(id) ON DELETE CASCADE,
     full_name VARCHAR(50),
     home_town VARCHAR(30),
     phone_number VARCHAR(20)
 );
 
 CREATE TABLE Report (
-    id UUID PRIMARY KEY,
+    id INTEGER PRIMARY KEY,
     subject VARCHAR(50) CHECK (subject IN ('Payments', 'Tickets', 'Delays', 'Other')),
     description TEXT NOT NULL,
-    document UUID DEFAULT NULL REFERENCES Document(id) ON DELETE SET NULL,
-    user_id UUID NOT NULL REFERENCES User(id) ON DELETE CASCADE,
-    inspector UUID NOT NULL REFERENCES User(id) ON DELETE CASCADE,
+    document INTEGER DEFAULT NULL REFERENCES Document(id) ON DELETE SET NULL,
+    user_id INTEGER NOT NULL REFERENCES User(id) ON DELETE CASCADE,
+    inspector INTEGER NOT NULL REFERENCES User(id) ON DELETE CASCADE,
     is_processed BOOLEAN DEFAULT FALSE,
     processed_at BOOLEAN DEFAULT FALSE,
     responded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE Document (
-    id UUID PRIMARY KEY,
+    id INTEGER PRIMARY KEY,
     file VARCHAR(50) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    user UUID NOT NULL REFERENCES User(id) ON DELETE CASCADE
+    user INTEGER NOT NULL REFERENCES User(id) ON DELETE CASCADE
 );
 
 CREATE TABLE Ticket (
-    id UUID PRIMARY KEY,
-    origin UUID NOT NULL REFERENCES Location(id) ON DELETE CASCADE,
-    destination UUID NOT NULL REFERENCES Location(id) ON DELETE CASCADE,
+    id INTEGER PRIMARY KEY,
+    origin INTEGER NOT NULL REFERENCES Location(id) ON DELETE CASCADE,
+    destination INTEGER NOT NULL REFERENCES Location(id) ON DELETE CASCADE,
     price FLOAT CHECK (price > 0),
     start_at TIMESTAMP NOT NULL,
-    duration INTERVAL NOT NULL,
-    delay INTERVAL DEFAULT NULL,
+    duration INT NOT NULL,
+    delay INT DEFAULT NULL,
     class VARCHAR(20) CHECK (class IN ('economic', 'VIP', 'business')),
     capacity INT NOT NULL CHECK (capacity > 0),
-    vehicle_type UUID NOT NULL REFERENCES Vehicle(id) ON DELETE CASCADE,
-    stops INTERVAL DEFAULT NULL
+    vehicle_type INTEGER NOT NULL REFERENCES Vehicle(id) ON DELETE CASCADE,
+    stops INT DEFAULT NULL
 );
 CREATE TABLE Reservation (
-    id UUID PRIMARY KEY,
-    user UUID NOT NULL REFERENCES User(id) ON DELETE CASCADE,
-    ticket UUID NOT NULL REFERENCES Ticket(id) ON DELETE CASCADE,
-    transaction UUID DEFAULT NULL REFERENCES Transaction(id) ON DELETE SET NULL,
+    id INTEGER PRIMARY KEY,
+    user INTEGER NOT NULL REFERENCES User(id) ON DELETE CASCADE,
+    ticket INTEGER NOT NULL REFERENCES Ticket(id) ON DELETE CASCADE,
+    transaction INTEGER DEFAULT NULL REFERENCES Transaction(id) ON DELETE SET NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     is_cancelled BOOLEAN DEFAULT FALSE,
@@ -62,7 +67,7 @@ CREATE TABLE Reservation (
 );
 
 CREATE TABLE Transaction (
-    id UUID PRIMARY KEY,
+    id INTEGER PRIMARY KEY,
     card_number VARCHAR(16) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     paid_amount INT NOT NULL CHECK (paid_amount >= 0),
@@ -72,21 +77,21 @@ CREATE TABLE Transaction (
 );
 
 CREATE TABLE Vehicle (
-    id UUID PRIMARY KEY,
+    id INTEGER PRIMARY KEY,
     name VARCHAR(50) NOT NULL,
     capacity INT NOT NULL CHECK (capacity > 0),
     vehicle_type VARCHAR(20) CHECK (vehicle_type IN ('Train', 'Airplane', 'Bus'))
 );
 
 CREATE TABLE Train (
-    id UUID PRIMARY KEY,
-    train_services UUID NOT NULL REFERENCES TrainServices(id) ON DELETE CASCADE,
+    id INTEGER PRIMARY KEY,
+    train_services INTEGER NOT NULL REFERENCES TrainServices(id) ON DELETE CASCADE,
     star_number INT NOT NULL CHECK (3 <= star_number AND star_number <= 5),
     private_campartment BOOLEAN,
     FOREIGN KEY (id) REFERENCES Vehicle(id) ON DELETE CASCADE
 );
 CREATE TABLE TrainServices (
-    id UUID PRIMARY KEY,
+    id INTEGER PRIMARY KEY,
     flatbed_wagon BOOLEAN DEFAULT FALSE,
     catering_services BOOLEAN DEFAULT FALSE,
     wifi_access BOOLEAN DEFAULT FALSE,
@@ -94,28 +99,28 @@ CREATE TABLE TrainServices (
 );
 
 CREATE TABLE Airplane (
-    id UUID PRIMARY KEY,
-    airplane_services UUID NOT NULL REFERENCES AirplaneServices(id) ON DELETE CASCADE,
+    id INTEGER PRIMARY KEY,
+    airplane_services INTEGER NOT NULL REFERENCES AirplaneServices(id) ON DELETE CASCADE,
     flight_number INT UNIQUE NOT NULL,
     flight_class VARCHAR(50) CHECK (flight_class IN ('Economy', 'Business', 'FirstClass')),
     FOREIGN KEY (id) REFERENCES Vehicle(id) ON DELETE CASCADE
 );
 CREATE TABLE AirplaneServices (
-    id UUID PRIMARY KEY,
+    id INTEGER PRIMARY KEY,
     catering_services BOOLEAN DEFAULT FALSE,
     wifi_access BOOLEAN DEFAULT FALSE,
     bedable_seats BOOLEAN DEFAULT FALSE
 );
 
 CREATE TABLE Bus (
-    id UUID PRIMARY KEY,
-    bus_services UUID NOT NULL REFERENCES BusServices(id) ON DELETE CASCADE,
+    id INTEGER PRIMARY KEY,
+    bus_services INTEGER NOT NULL REFERENCES BusServices(id) ON DELETE CASCADE,
     bus_type VARCHAR(50) CHECK (bus_type IN ('VIP', 'Normal', 'Sleepable')),
     seat_kind VARCHAR(50) CHECK (seat_kind IN ('1+1', '2+1')),
     FOREIGN KEY (id) REFERENCES Vehicle(id) ON DELETE CASCADE
 );
 CREATE TABLE BusServices (
-    id UUID PRIMARY KEY,
+    id INTEGER PRIMARY KEY,
     catering_services BOOLEAN DEFAULT FALSE,
     individual_screen BOOLEAN DEFAULT FALSE,
     air_conditioning BOOLEAN DEFAULT FALSE
